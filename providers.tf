@@ -13,6 +13,6 @@ terraform {
 }
 
 provider "aws" {
-  region  = "eu-north-1"
-  profile = "terraform"
+  region  = var.aws_region
+  profile = var.aws_profile
 }
