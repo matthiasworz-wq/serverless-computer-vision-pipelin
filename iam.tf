@@ -50,6 +50,13 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "dynamodb:PutItem"
         ]
         Resource = aws_dynamodb_table.metadata_table.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "sqs:SendMessage"
+        ]
+        Resource = aws_sqs_queue.lambda_dlq.arn
       }
     ]
   })

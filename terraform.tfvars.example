@@ -1,0 +1,6 @@
+aws_region            = "eu-north-1"
+aws_profile           = "terraform"
+bucket_name           = "vision-pipeline-input-matthias-worz"
+table_name            = "image-metadata-table"
+lambda_function_name  = "image-vision-processor"
+resource_name_suffix  = "matthias"
