@@ -81,7 +81,7 @@ def add_architecture(slide):
         ("Client", 0.7, 2.5),
         ("S3\nprivat", 3.0, 2.5),
         ("Lambda\nPython 3.12", 5.5, 2.5),
-        ("Rekognition", 8.3, 1.6),
+        ("Pillow\nBildanalyse", 8.3, 1.6),
         ("DynamoDB", 8.3, 3.4),
         ("SQS DLQ", 10.7, 2.5),
     ]
@@ -153,7 +153,7 @@ def build():
         ("1. Ausgangslage und realistisches Szenario", [
             "Fiktiver Onlinehändler für gebrauchte Elektronik",
             "Ca. 100 Bild-Uploads pro Monat durch Mitarbeitende",
-            "Automatische Voranalyse von Objekten und Texten",
+            "Automatische technische Qualitätsprüfung von Produktbildern",
             "Kleines IT-Team ohne dauerhaft laufende Server",
             "Testbudget: höchstens 1 EUR pro Monat",
         ]),
@@ -168,7 +168,7 @@ def build():
         ("4. Auswahl der AWS-Dienste", [
             "Amazon S3: privater, verschlüsselter Objektspeicher",
             "AWS Lambda: Python 3.12, ereignisgesteuerte Verarbeitung",
-            "Amazon Rekognition: DetectLabels und DetectText",
+            "Pillow in Lambda: Format, Größe, Helligkeit, Kontrast und Schärfe",
             "Amazon DynamoDB: strukturierte Metadaten mit On-Demand-Billing",
             "Amazon SQS: Dead-Letter-Queue für fehlgeschlagene Aufrufe",
         ]),
@@ -204,9 +204,9 @@ def build():
             "[Screenshot ergänzen] Ressourcen vor terraform destroy",
         ]),
         ("12. Alternativen und Grenzen", [
-            "Textract wäre für stark dokumentenorientierte OCR eine Alternative",
+            "Rekognition oder Textract wären spätere Erweiterungen für Objekte und OCR",
             "EC2 gäbe mehr Kontrolle, erzeugte aber Leerlaufkosten und Wartung",
-            "Rekognition reduziert Aufwand, erhöht jedoch den AWS Vendor Lock-in",
+            "Die lokale Pillow-Analyse vermeidet externe Vision-APIs und Vendor Lock-in",
             "Produktivbetrieb benötigt zusätzlich Monitoring, zentrale States und KMS",
         ]),
         ("13. Reflexion und Lessons Learned", [
@@ -225,7 +225,7 @@ def build():
         if title == "3. Architektur und Datenfluss":
             add_architecture(slide)
             add_bullets(slide, [
-                "S3 ObjectCreated → Lambda → Rekognition → DynamoDB",
+                "S3 ObjectCreated → Lambda + Pillow → DynamoDB",
                 "Fehlerhafte asynchrone Aufrufe werden an SQS-DLQ weitergeleitet",
             ], top=5.2, height=1.0, size=15)
         elif title == "6. Zentrale Terraform-Konfiguration":
@@ -237,12 +237,12 @@ def build():
 }""")
         elif title == "7. Lambda-Verarbeitungslogik":
             add_code(slide, """key = unquote_plus(record["s3"]["object"]["key"])
-labels = rekognition.detect_labels(...)
-texts = rekognition.detect_text(...)
+image = s3.get_object(Bucket=bucket, Key=key)
+metrics = analyze_image(image["Body"].read())
 table.put_item(Item={
     "image_id": key,
-    "labels": labels,
-    "detected_text": texts,
+    "quality": metrics["quality"],
+    "sharpness": metrics["sharpness"],
 })""")
         elif title == "10. Deployment-Prozess":
             add_code(slide, """terraform init
@@ -261,7 +261,7 @@ terraform destroy""")
     slide = prs.slides.add_slide(blank)
     add_title(slide, "Quellen und Repository")
     add_bullets(slide, [
-        "AWS Lambda, S3, DynamoDB, Rekognition, SQS und IAM – offizielle AWS-Dokumentation",
+        "AWS Lambda, S3, DynamoDB, SQS und IAM sowie Pillow – offizielle Dokumentationen",
         "Terraform AWS Provider – Registry und Ressourcendokumentation",
         "IU: Aufgabenstellung Cloud Programming (DLBSEPCP01_D)",
         "Repository: https://github.com/matthiasworz-wq/serverless-computer-vision-pipelin",
