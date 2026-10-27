@@ -1,11 +1,5 @@
-data "archive_file" "lambda_zip" {
-  type        = "zip"
-  source_dir  = "${path.module}/lambda"
-  output_path = "${path.module}/lambda.zip"
-}
-
 resource "aws_lambda_function" "vision_processor" {
-  filename                       = data.archive_file.lambda_zip.output_path
+  filename                       = "${path.module}/lambda.zip"
   function_name                  = var.lambda_function_name
   role                           = aws_iam_role.lambda_role.arn
   handler                        = "handler.handler"
@@ -13,11 +7,12 @@ resource "aws_lambda_function" "vision_processor" {
   timeout                        = 30
   memory_size                    = 128
   reserved_concurrent_executions = 1
-  source_code_hash               = data.archive_file.lambda_zip.output_base64sha256
+  source_code_hash               = filebase64sha256("${path.module}/lambda.zip")
 
   environment {
     variables = {
-      TABLE_NAME = aws_dynamodb_table.metadata_table.name
+      TABLE_NAME      = aws_dynamodb_table.metadata_table.name
+      MAX_IMAGE_BYTES = "10485760"
     }
   }
 

@@ -1,10 +1,10 @@
 # Serverless Computer Vision Pipeline auf AWS
 
-Dieses Projekt ist die Umsetzung von **Aufgabe 2: Entwicklung einer eigenen kreativen Cloud-Lösung** im IU-Kurs *Cloud Programming*. Ein Bild wird in einen privaten Amazon-S3-Bucket hochgeladen, automatisch durch AWS Lambda verarbeitet, mit Amazon Rekognition analysiert und als strukturierte Metadaten in Amazon DynamoDB gespeichert.
+Dieses Projekt ist die Umsetzung von **Aufgabe 2: Entwicklung einer eigenen kreativen Cloud-Lösung** im IU-Kurs *Cloud Programming*. Ein Bild wird in einen privaten Amazon-S3-Bucket hochgeladen, automatisch durch AWS Lambda mit Pillow auf Bildqualität geprüft und als strukturierte Metadaten in Amazon DynamoDB gespeichert.
 
 ## 1. Realistisches Szenario und Ziel
 
-Ein kleiner Onlinehändler für gebrauchte Elektronik erhält etwa 100 Bild-Uploads pro Monat. Die Bilder sollen automatisch mit Objekt- und Texterkennung voranalysiert werden, damit Mitarbeitende Produktdaten schneller erfassen können. Das fiktive Unternehmen hat ein kleines IT-Team, möchte keinen Server dauerhaft betreiben und setzt ein monatliches Testbudget von höchstens 1 EUR voraus.
+Ein kleiner Onlinehändler für gebrauchte Elektronik erhält etwa 100 Bild-Uploads pro Monat. Die Bilder sollen automatisch auf technische Qualität geprüft werden, damit Mitarbeitende ungeeignete Produktfotos vor der Veröffentlichung erkennen. Das fiktive Unternehmen hat ein kleines IT-Team, möchte keinen Server dauerhaft betreiben und setzt ein monatliches Testbudget von höchstens 1 EUR voraus.
 
 Die priorisierten Anforderungen sind:
 
@@ -26,12 +26,12 @@ Privater Amazon-S3-Bucket
   │ ObjectCreated-Event
   ▼
 AWS Lambda (Python 3.12)
-  ├── Amazon Rekognition: DetectLabels + DetectText
+  ├── Pillow: Format, Größe, Helligkeit, Kontrast und Schärfe
   ├── Amazon DynamoDB: PutItem mit Analyse-Metadaten
   └── SQS-DLQ bei fehlgeschlagener Verarbeitung
 ```
 
-Die Lambda-Funktion verarbeitet auch mehrere Datensätze in einem Event, dekodiert URL-kodierte S3-Schlüssel und speichert erkannte Textzeilen sowie Labels. Testbilder werden nach sieben Tagen automatisch aus S3 entfernt. CloudWatch-Logs werden sieben Tage aufbewahrt.
+Die Lambda-Funktion verarbeitet auch mehrere Datensätze in einem Event, dekodiert URL-kodierte S3-Schlüssel, lädt das Bild aus S3 und berechnet lokale Bildqualitätsmetriken. Gespeichert werden unter anderem Format, Abmessungen, Dateigröße, durchschnittliche Farbe, Helligkeit, Kontrast, Schärfe und eine Qualitätsklassifizierung (`good`, `acceptable` oder `needs_review`). Testbilder werden nach sieben Tagen automatisch aus S3 entfernt. CloudWatch-Logs werden sieben Tage aufbewahrt.
 
 ## 3. Repository-Struktur
 
@@ -45,6 +45,9 @@ Die Lambda-Funktion verarbeitet auch mehrere Datensätze in einem Event, dekodie
 | `dynamodb.tf` | DynamoDB-Tabelle für Metadaten |
 | `iam.tf` | Ausführungsrolle mit begrenzten Berechtigungen |
 | `lambda/handler.py` | Python-Verarbeitungslogik |
+| `lambda/requirements.txt` | Reproduzierbare Pillow-Abhängigkeit |
+| `tools/package_lambda.py` | Erstellt ein AWS-kompatibles Lambda-ZIP mit Pillow |
+| `tests/test_image_analysis.py` | Lokaler Test der Bildanalyse |
 | `outputs.tf` | Ausgaben nach dem Deployment |
 
 Terraform-State, Pläne, Zugangsdaten und lokale Variablen werden durch `.gitignore` vom Repository ausgeschlossen. Die Datei `.terraform.lock.hcl` wird dagegen versioniert, damit Provider-Versionen reproduzierbar bleiben.
@@ -55,6 +58,7 @@ Terraform-State, Pläne, Zugangsdaten und lokale Variablen werden durch `.gitign
 - AWS CLI mit einem lokalen Profil, z. B. `terraform`
 - Terraform >= 1.5
 - Python 3.12 für lokale Syntaxprüfungen
+- Internetzugriff beim einmaligen Erstellen des Lambda-Pakets für Pillow
 
 Die AWS-Zugangsdaten werden ausschließlich lokal über AWS CLI/Profile oder Umgebungsvariablen verwendet. Sie gehören niemals in `terraform.tfvars`, den Lambda-Code oder GitHub.
 
@@ -67,6 +71,8 @@ Copy-Item terraform.tfvars.example terraform.tfvars
 terraform init
 terraform fmt -check
 terraform validate
+python tools/package_lambda.py
+python -m pytest -q tests/test_image_analysis.py
 terraform plan -out phase2.tfplan
 ```
 
@@ -96,12 +102,13 @@ Anschließend in AWS zusätzlich kontrollieren, dass S3-Bucket, Lambda, DynamoDB
 - CloudWatch-Logs werden sieben Tage aufbewahrt
 - S3 und DynamoDB nutzen serverseitige Verschlüsselung
 - S3 Public Access Block ist vollständig aktiviert
-- Lambda darf nur das erforderliche S3-Objekt lesen, Rekognition aufrufen, in DynamoDB schreiben und Fehler an die DLQ senden
+- Lambda darf nur das erforderliche S3-Objekt lesen, in DynamoDB schreiben und Fehler an die DLQ senden
+- Die Bildanalyse läuft lokal in Lambda; es werden keine externen Vision- oder OCR-APIs aufgerufen
 
 Diese Maßnahmen reduzieren das Risiko, ersetzen aber keine Prüfung der AWS-Kostenanzeige und keine Kontrolle der Free-Tier-Grenzen.
 
 ## 7. Alternativen und Grenzen
 
-Amazon Textract wäre für stark dokumentenorientierte Texterkennung eine mögliche Alternative. Ein eigener ML-Service oder EC2 würde mehr Kontrolle geben, aber dauerhaft höhere Betriebs- und Administrationskosten verursachen. Rekognition ist für den kleinen, ereignisgesteuerten Anwendungsfall die wirtschaftlichere Wahl, erzeugt aber einen AWS Vendor Lock-in.
+Amazon Rekognition oder Textract wären mögliche Erweiterungen, wenn später Objekt- oder Texterkennung benötigt wird. Ein eigener ML-Service oder EC2 würde mehr Kontrolle geben, aber dauerhaft höhere Betriebs- und Administrationskosten verursachen. Die gewählte Pillow-Analyse ist bewusst unabhängig von regional nicht verfügbaren oder gesperrten KI-Diensten.
 
 Die Lösung ist für einen kontrollierten Studienprototypen ausgelegt. Für einen produktiven Betrieb wären unter anderem zentrale State-Verwaltung, Monitoring/Alarme, Bildgrößenlimits, Verschlüsselung mit kundeneigenem KMS-Schlüssel und eine strengere Trennung von Entwicklungs- und Produktionskonto zu ergänzen.

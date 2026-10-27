@@ -39,14 +39,6 @@ resource "aws_iam_role_policy" "lambda_policy" {
       {
         Effect = "Allow"
         Action = [
-          "rekognition:DetectLabels",
-          "rekognition:DetectText"
-        ]
-        Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
           "dynamodb:PutItem"
         ]
         Resource = aws_dynamodb_table.metadata_table.arn
