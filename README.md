@@ -91,7 +91,7 @@ Nach der Dokumentation der Testergebnisse:
 terraform destroy
 ```
 
-Anschließend in AWS zusätzlich kontrollieren, dass S3-Bucket, Lambda, DynamoDB-Tabelle, SQS-DLQ und Loggruppe entfernt wurden. Erst danach kann das Repository wieder öffentlich gemacht werden. Die offiziellen IU-Aufgabenunterlagen und dein Bewertungsdokument sollten vor einer Veröffentlichung entfernt werden.
+Anschließend in AWS zusätzlich kontrollieren, dass S3-Bucket, Lambda, DynamoDB-Tabelle, SQS-DLQ und Loggruppe entfernt wurden. Erst danach kann das Repository wieder öffentlich gemacht werden. Offizielle Aufgabenunterlagen und persönliche Bewertungsdokumente sind nicht Bestandteil dieses technischen Repositories.
 
 ## 6. Kosten- und Sicherheitsmaßnahmen
 
