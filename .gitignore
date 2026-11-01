@@ -4,6 +4,7 @@
 *.tfplan
 terraform.tfvars
 !terraform.tfvars.example
+testbild.jpg
 build/
 __pycache__/
 *.pyc
