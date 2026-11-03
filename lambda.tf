@@ -5,7 +5,7 @@ resource "aws_lambda_function" "vision_processor" {
   handler                        = "handler.handler"
   runtime                        = "python3.12"
   timeout                        = 30
-  memory_size                    = 512
+  memory_size                    = 128
   reserved_concurrent_executions = 1
   source_code_hash               = filebase64sha256("${path.module}/lambda.zip")
 
