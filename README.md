@@ -47,8 +47,10 @@ Die Lambda-Funktion verarbeitet auch mehrere Datensätze in einem Event, dekodie
 | `lambda/handler.py` | Python-Verarbeitungslogik |
 | `lambda/requirements.txt` | Reproduzierbare Pillow-Abhängigkeit |
 | `tools/package_lambda.py` | Erstellt ein AWS-kompatibles Lambda-ZIP mit Pillow |
-| `tests/test_image_analysis.py` | Lokaler Test der Bildanalyse |
+| `tests/test_image_analysis.py` | Lokale Tests der Bildanalyse |
 | `outputs.tf` | Ausgaben nach dem Deployment |
+| `REFERENCES.md` | Quellen, technische Referenzen und Provenienz |
+| `ACADEMIC_INTEGRITY.md` | Abgrenzung zwischen Repository und formaler IU-Abgabe |
 
 Terraform-State, Pläne, Zugangsdaten und lokale Variablen werden durch `.gitignore` vom Repository ausgeschlossen. Die Datei `.terraform.lock.hcl` wird dagegen versioniert, damit Provider-Versionen reproduzierbar bleiben.
 
@@ -107,7 +109,22 @@ Anschließend in AWS zusätzlich kontrollieren, dass S3-Bucket, Lambda, DynamoDB
 
 Diese Maßnahmen reduzieren das Risiko, ersetzen aber keine Prüfung der AWS-Kostenanzeige und keine Kontrolle der Free-Tier-Grenzen.
 
-## 7. Alternativen und Grenzen
+## 7. Wissenschaftliche Dokumentation und Quellen
+
+Die technischen Aussagen in diesem Repository werden in den Konzept- und
+Implementierungsdokumenten durch die Einträge in [`REFERENCES.md`](REFERENCES.md)
+belegt. Die Dokumentation beschreibt ausschließlich den tatsächlich implementierten
+Stand; nicht ausgeführte Deployments, Messwerte und Screenshots werden nicht als
+erreichte Ergebnisse dargestellt.
+
+Die formalen Anforderungen an einen IU-Projektbericht, insbesondere Umfang,
+Gliederung, Zitierstandard, Literaturverzeichnis und eidesstattliche Erklärung,
+gelten für die Prüfungsabgabe in myCampus. Dieses technische Repository ist kein
+Ersatz für den einzureichenden Projektbericht. Die Abgrenzung und die Hinweise zur
+eigenständigen Erstellung sind in [`ACADEMIC_INTEGRITY.md`](ACADEMIC_INTEGRITY.md)
+dokumentiert.
+
+## 8. Alternativen und Grenzen
 
 Amazon Rekognition oder Textract wären mögliche Erweiterungen, wenn später Objekt- oder Texterkennung benötigt wird. Ein eigener ML-Service oder EC2 würde mehr Kontrolle geben, aber dauerhaft höhere Betriebs- und Administrationskosten verursachen. Die gewählte Pillow-Analyse ist bewusst unabhängig von regional nicht verfügbaren oder gesperrten KI-Diensten.
 

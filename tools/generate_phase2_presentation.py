@@ -211,7 +211,7 @@ def build():
         ]),
         ("13. Reflexion und Lessons Learned", [
             "Die ereignisgesteuerte Architektur passt besser als ein Dauerbetrieb",
-            "Tutor-Feedback wurde durch Szenario, Budget und Kostenabschätzung eingearbeitet",
+            "Anforderungen wurden durch Szenario, Budget und Kostenabschätzung konkretisiert",
             "IaC macht die Infrastruktur prüfbar und reproduzierbar",
             "Kostenkontrolle benötigt technische Limits und manuelle Kontrollen",
             "Die reale Bereitstellung und die Screenshots sind Teil des Nachweises",

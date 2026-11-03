@@ -4,7 +4,7 @@
 **Projekt:** IU Cloud Programming, Aufgabe 2  
 **Technologie:** AWS, Terraform, Python 3.12 und Pillow  
 **Zielregion:** Stockholm (`eu-north-1`)  
-**Status:** Studienprototyp
+**Status:** Studienprototyp; technische Dokumentation, kein vollständiger IU-Projektbericht
 
 ## 1. Geschäftsszenario
 
@@ -183,3 +183,17 @@ Mögliche spätere Erweiterungen sind:
 - CloudWatch-Alarme und ein Dashboard.
 
 Diese Erweiterungen gehören nicht zum aktuellen Minimalumfang und werden nur umgesetzt, wenn Kosten, Region und Berechtigungen vorher eindeutig geklärt sind.
+
+## 12. Quellen und Dokumentationsgrenzen
+
+Die technischen Grundlagen und verwendeten Dienste sind in
+[`REFERENCES.md`](REFERENCES.md) verzeichnet. Aussagen über eine erfolgreiche
+Bereitstellung oder gemessene Kosten dürfen erst nach Durchführung des
+beschriebenen Testplans ergänzt werden. Platzhalter oder nicht durchgeführte
+Arbeitsschritte werden nicht als Ergebnisse ausgegeben.
+
+Dieses Konzeptblatt dokumentiert die technische Lösung, ersetzt aber nicht den
+formalen IU-Projektbericht. Für die Prüfungsabgabe müssen insbesondere die
+geforderte Gliederung, die Quellenangaben im Fließtext, das Literaturverzeichnis
+und die elektronische eidesstattliche Erklärung nach den IU-Vorgaben separat
+erstellt bzw. abgegeben werden.
