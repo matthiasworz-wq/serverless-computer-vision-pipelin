@@ -6,5 +6,6 @@ terraform.tfvars
 !terraform.tfvars.example
 testbild.jpg
 build/
+.pytest_cache/
 __pycache__/
 *.pyc
